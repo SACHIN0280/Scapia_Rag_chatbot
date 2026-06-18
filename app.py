@@ -595,17 +595,20 @@ def render_chat():
         messages.append({"role": "user", "content": prompt})
         
         # Auto rename if this is the first message and title is "New Chat"
-        if len(messages) == 1 and active_chat["title"] == "New Chat":
+        if len(messages) > 0 and active_chat["title"] == "New Chat":
+            first_msg = messages[0]["content"]
             try:
                 title_llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.3)
-                title_prompt = f"Generate a short 2-4 word title summarizing this query. Output ONLY the title, no quotes, no extra text:\n\n{prompt}"
+                title_prompt = f"Generate a short 2-4 word title summarizing this query. Output ONLY the title, no quotes, no extra text:\n\n{first_msg}"
                 generated_title = title_llm.invoke(title_prompt).content.strip().strip('"')
-                st.session_state.chats[st.session_state.current_chat_id]["title"] = generated_title if generated_title else prompt[:30]
-            except Exception:
-                st.session_state.chats[st.session_state.current_chat_id]["title"] = prompt[:30] + ("..." if len(prompt) > 30 else "")
+                new_title = generated_title if generated_title else first_msg[:30]
+            except Exception as e:
+                new_title = first_msg[:30] + ("..." if len(first_msg) > 30 else "")
             
-            # Force Streamlit to recognize the deep mutation
-            st.session_state["chats"] = st.session_state.chats
+            # Reassign dictionary completely to force Streamlit state update
+            chats_copy = dict(st.session_state.chats)
+            chats_copy[st.session_state.current_chat_id]["title"] = new_title
+            st.session_state.chats = chats_copy
             
         save_chats(st.session_state.chats)
         st.rerun()
