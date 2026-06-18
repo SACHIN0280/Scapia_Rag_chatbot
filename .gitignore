@@ -5,6 +5,6 @@ __pycache__/
 .DS_Store
 chroma_db/
 chats.json
-.streamlit/
+
 test_*.py
 debug_*.py
