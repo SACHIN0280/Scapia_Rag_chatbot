@@ -1,0 +1,11 @@
+streamlit
+langchain
+langchain-community
+chromadb
+youtube-transcript-api
+pdfplumber
+google-generativeai
+langchain-google-genai
+python-dotenv
+langchain-groq
+sentence-transformers
