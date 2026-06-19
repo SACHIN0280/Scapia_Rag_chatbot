@@ -103,17 +103,14 @@ def get_text_chunks(text):
     return chunks
 
 def get_vector_store(text_chunks, persist_directory="./chroma_db"):
-    """Create a fresh Chroma vector store from text chunks and save it locally.
-
-    Wipes any existing collection at persist_directory first. Without this,
-    Chroma.from_texts() keeps APPENDING to the same collection on every
-    'Process Documents' click, so old PDFs/transcripts never go away and
-    silently pollute retrieval for every later chat (irrelevant chunks in
-    the k=15 results -> worse answers, slower generation).
-    """
-    import shutil
+    """Create a fresh Chroma vector store from text chunks and save it locally."""
+    # Properly clear existing data to prevent InternalError from file locks
     if os.path.exists(persist_directory):
-        shutil.rmtree(persist_directory)
+        try:
+            old_vs = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
+            old_vs.delete_collection()
+        except Exception as e:
+            print(f"Warning: Could not delete old collection: {e}")
 
     vector_store = Chroma.from_texts(
         texts=text_chunks,
