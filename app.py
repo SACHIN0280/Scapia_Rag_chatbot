@@ -593,9 +593,14 @@ def render_chat():
 
     if prompt := st.chat_input("Message Scapia AI..."):
         messages.append({"role": "user", "content": prompt})
+        save_chats(st.session_state.chats)
+        st.rerun()
+
+    # Handle Assistant Response if last message is from user
+    if messages and messages[-1]["role"] == "user":
         
         # Auto rename if this is the first message and title is "New Chat"
-        if len(messages) > 0 and active_chat["title"] == "New Chat":
+        if len(messages) == 1 and active_chat["title"] == "New Chat":
             first_msg = messages[0]["content"]
             try:
                 title_llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.3)
@@ -605,16 +610,11 @@ def render_chat():
             except Exception as e:
                 new_title = first_msg[:30] + ("..." if len(first_msg) > 30 else "")
             
-            # Reassign dictionary completely to force Streamlit state update
             chats_copy = dict(st.session_state.chats)
             chats_copy[st.session_state.current_chat_id]["title"] = new_title
             st.session_state.chats = chats_copy
-            
-        save_chats(st.session_state.chats)
-        st.rerun()
+            save_chats(st.session_state.chats)
 
-    # Handle Assistant Response if last message is from user
-    if messages and messages[-1]["role"] == "user":
         with st.chat_message("assistant"):
             vs = load_vector_store()
             if not vs:
