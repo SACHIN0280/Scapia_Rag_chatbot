@@ -2,6 +2,10 @@ import os
 import re
 import json
 import uuid
+import io
+import requests
+import yt_dlp
+import webvtt
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from langchain_community.vectorstores import Chroma
@@ -40,6 +44,36 @@ def extract_video_id(url):
         return parsed_url.path[1:]
     return None
 
+def get_youtube_transcript_ytdlp(url):
+    """Fallback method to fetch transcript using yt-dlp."""
+    ydl_opts = {
+        'skip_download': True,
+        'writesubtitles': True,
+        'writeautomaticsub': True,
+        'subtitleslangs': ['en'],
+        'quiet': True,
+        'no_warnings': True
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        subs = info.get('requested_subtitles', {})
+        if subs and 'en' in subs:
+            sub_url = subs['en']['url']
+            response = requests.get(sub_url)
+            response.raise_for_status()
+            
+            # Parse VTT
+            vtt = webvtt.read_buffer(io.StringIO(response.text))
+            
+            # Remove duplicates which are common in auto-generated subs
+            lines = [caption.text.replace("\n", " ").strip() for caption in vtt]
+            unique_lines = []
+            for line in lines:
+                if not unique_lines or line != unique_lines[-1]:
+                    unique_lines.append(line)
+            return " ".join(unique_lines)
+        raise Exception("No English subtitles found via yt-dlp.")
+
 def get_youtube_transcript(url):
     """Fetch transcript from a YouTube video."""
     video_id = extract_video_id(url)
@@ -52,7 +86,11 @@ def get_youtube_transcript(url):
         transcript = ' '.join([t.text for t in transcript_data])
         return transcript
     except Exception as e:
-        raise Exception(f"Failed to extract transcript: {str(e)}")
+        print(f"youtube_transcript_api failed: {e}. Falling back to yt-dlp...")
+        try:
+            return get_youtube_transcript_ytdlp(url)
+        except Exception as fallback_e:
+            raise Exception(f"Failed to extract transcript: {str(e)} | Fallback also failed: {str(fallback_e)}")
 
 def get_text_chunks(text):
     """Split text into manageable chunks for the vector store."""
