@@ -431,7 +431,7 @@ Answer (strictly from context):"""
         if len(chat_messages) > 1:
             history_msgs = chat_messages[-5:-1]
             history_str = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in history_msgs])
-            rewrite_prompt = f"Given the chat history below, rewrite the user's latest query into a standalone query that resolves references like 'it' or 'again'. Do NOT answer the query, just output the rewritten standalone query string and nothing else.\n\nChat History:\n{history_str}\n\nLatest Query: {question}\n\nStandalone Query:"
+            rewrite_prompt = f"Given the chat history below, rewrite the user's latest query into a standalone query that resolves references like 'it' or 'again'. Maintain the specific intent of the user's latest query (e.g., if they ask to 'explain it', rewrite it to 'explain [topic]'). Do NOT answer the query, just output the rewritten standalone query string and nothing else.\n\nChat History:\n{history_str}\n\nLatest Query: {question}\n\nStandalone Query:"
             try:
                 search_query = llm.invoke(rewrite_prompt).content.strip()
             except Exception:
