@@ -190,123 +190,187 @@ div.stButton > button:hover { transform: translateY(-2px) !important; box-shadow
     """
 elif view == "chat":
     dynamic_css = """
-    /* Chat Specific CSS */
+    /* Global Adjustments */
+    [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+        background: #0B1121 !important;
+        background-image: none !important;
+    }
+    
+    [data-testid="stMain"] { background: #0B1121 !important; }
+
+    /* Custom Sidebar styling */
     [data-testid="stSidebar"] {
         display: flex !important;
-        background: #111827 !important;
+        background: #0B1121 !important;
         border-right: 1px solid #1f2937 !important;
-        min-width: 280px !important;
-        max-width: 280px !important;
+        min-width: 250px !important;
+        max-width: 250px !important;
         transform: translateX(0px) !important;
         visibility: visible !important;
-        padding-bottom: 70px !important;
+        padding-top: 10px !important;
     }
     [data-testid="stSidebarCollapseButton"] { display: none !important; }
-    
-    /* File Uploader */
-    [data-testid="stFileUploader"] { background: #1f2937 !important; border: 1px dashed #374151 !important; border-radius: 12px !important; padding: 12px !important; }
-    [data-testid="stFileUploader"] p { color: #9ca3af !important; font-size: 13px !important; }
-    [data-testid="stFileUploaderDropzoneIcon"] { display: none !important; }
-    [data-testid="stFileUploader"] button { width: auto !important; background: #374151 !important; padding: 4px 12px !important; font-size: 12px !important; color: white !important; margin-top: 10px !important; }
 
-    /* Text Input */
-    .stTextInput > div > div > input {
-        background: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 8px !important;
-        color: #f3f4f6 !important;
-        font-size: 13px !important;
-        padding: 10px !important;
+    .sidebar-menu-item {
+        padding: 10px 16px;
+        margin: 4px 16px;
+        border-radius: 8px;
+        color: #94a3b8;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s;
+        text-decoration: none;
+        cursor: pointer;
     }
-    .stTextInput > div > div > input:focus { border-color: #6366f1 !important; box-shadow: none !important; }
-    .stTextInput label { display: none !important; }
+    .sidebar-menu-item:hover { background: #1e293b; color: #f8fafc; }
+    .sidebar-menu-item.active { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 
-    /* Chat Messages */
-    [data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 10px 15px !important; }
-    [data-testid="stChatMessageContent"] { font-size: 15px !important; line-height: 1.6 !important; color: #f8fafc !important; }
+    /* Top Bar */
+    .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        margin-bottom: 20px;
+    }
+    
+    .search-box {
+        display: flex;
+        align-items: center;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 6px 12px;
+        width: 400px;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+    .search-box input {
+        background: transparent;
+        border: none;
+        color: #f8fafc;
+        width: 100%;
+        outline: none;
+        margin-left: 8px;
+    }
+    
+    /* Panels */
+    .dashboard-panel {
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 20px;
+        height: 75vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+    }
+    .panel-header {
+        font-size: 15px;
+        font-weight: 600;
+        color: #f8fafc;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .panel-header span.icons { color: #64748b; letter-spacing: 4px; font-weight: normal; }
+
+    /* PDF Preview */
+    iframe.pdf-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 8px;
+        background: #1e293b;
+    }
+    .pdf-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #64748b;
+        font-size: 14px;
+        background: #1e293b;
+        border-radius: 8px;
+        border: 1px dashed #334155;
+    }
+
+    /* Chat Messages Container */
+    .chat-history {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 10px;
+        padding-bottom: 80px; /* space for input */
+    }
+
+    /* Chat Messages overrides */
+    [data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 12px 0 !important; }
     .stChatMessageAvatar { display: none !important; }
 
     /* User Bubble */
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) { flex-direction: row-reverse !important; display: flex !important; }
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) { flex-direction: column !important; align-items: flex-start !important; }
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"] {
-        background: #312e81 !important; /* Deep Indigo Bubble */
-        border: 1px solid #3730a3 !important;
-        border-radius: 16px 16px 4px 16px !important;
-        padding: 12px 18px !important;
-        max-width: 70% !important;
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-radius: 12px 12px 12px 4px !important;
+        padding: 12px 16px !important;
+        max-width: 90% !important;
         color: #f8fafc !important;
-        margin-left: auto !important;
+        font-size: 14px !important;
     }
 
     /* Assistant Bubble */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) { flex-direction: column !important; align-items: flex-start !important; }
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessageContent"] {
-        background: transparent !important;
-        border: none !important;
-        padding: 12px 0 !important;
-        max-width: 750px !important;
-        margin: 0 auto !important;
+        background: rgba(16, 185, 129, 0.05) !important;
+        border: 1px solid rgba(16, 185, 129, 0.1) !important;
+        border-radius: 12px 12px 12px 4px !important;
+        padding: 12px 16px !important;
+        max-width: 90% !important;
+        color: #e2e8f0 !important;
+        font-size: 14px !important;
     }
 
-    /* Chat Input Bar */
-    [data-testid="stBottom"] { background: transparent !important; }
-    [data-testid="stBottom"] > div { background: transparent !important; }
-    [data-testid="stBottomBlockContainer"] { background: transparent !important; display: flex !important; justify-content: center !important; }
-    [data-testid="stChatInput"] { background: transparent !important; padding: 20px !important; width: 100% !important; max-width: 750px !important; margin: 0 auto !important; transform: translateX(-65px) !important; }
+    /* Avatar Overrides in HTML */
+    .chat-avatar-user { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .chat-avatar-ai { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+    .chat-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .chat-name { font-size: 13px; font-weight: 600; color: #f8fafc; }
+
+    /* Hide native chat input elements partially to inline them inside the right panel */
+    [data-testid="stChatInput"] { 
+        position: absolute !important;
+        bottom: 20px !important;
+        left: 20px !important;
+        right: 20px !important;
+        width: calc(100% - 40px) !important;
+        background: transparent !important; 
+        padding: 0 !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
     [data-testid="stChatInput"] > div {
         background: #1e293b !important;
         border: 1px solid #334155 !important;
-        border-radius: 20px !important;
-        padding: 6px 10px !important;
-        width: 100% !important;
+        border-radius: 12px !important;
+        padding: 4px 8px !important;
     }
-    [data-testid="stChatInput"] textarea { color: #f8fafc !important; font-size: 15px !important; background: transparent !important; }
-    [data-testid="stChatInput"] button { background: #6366f1 !important; border-radius: 12px !important; }
+    [data-testid="stChatInput"] textarea { color: #f8fafc !important; font-size: 14px !important; }
     
-    /* Expander */
-    [data-testid="stExpander"] { background: #1e293b !important; border: 1px solid #334155 !important; border-radius: 10px !important; }
-    [data-testid="stExpander"] summary { color: #94a3b8 !important; }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    /* Top Nav */
-    .chat-nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-bottom:1px solid #1e293b; background:#0F172A; }
-    .chat-nav-logo { display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; color:#f8fafc; }
-    .chat-nav-logo-icon { width:28px; height:28px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:14px; }
-    .stButton > button { margin-bottom: 8px; }
-    /* Floating Selectbox right side of Chat Input */
-    [data-testid="stSelectbox"] {
-        position: fixed;
-        bottom: 82px; 
-        right: max(calc(50vw - 675px), 0px);
-        width: 200px !important;
-        z-index: 99999;
-    }
-    
-    /* Dark pill styling */
-    [data-testid="stSelectbox"] > div > div {
-        background: #111827 !important;
-        border: 1px solid #334155 !important;
-        border-radius: 8px !important;
-        min-height: 32px !important;
-        padding: 0 4px !important;
-        cursor: pointer !important;
-    }
-    
-    /* Hide the typing cursor so it feels like a button */
-    [data-testid="stSelectbox"] input {
-        caret-color: transparent !important;
-        cursor: pointer !important;
-    }
-    
-    /* Small text */
-    [data-testid="stSelectbox"] div[data-baseweb="select"] {
-        font-size: 12px !important;
-        color: #f8fafc !important;
-    }
-    [data-testid="stSelectbox"] label { display: none !important; }
-    
-    /* Normal padding */
-    [data-testid="stChatInput"] textarea {
-        padding-right: 50px !important;
-    }
+    /* Logo area */
+    .logo-area { display: flex; align-items: center; gap: 10px; padding: 10px 20px; margin-bottom: 20px; font-size: 18px; font-weight: 700; color: #f8fafc; }
+    .logo-icon { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; }
     """
 
 st.markdown(f"""
@@ -479,6 +543,10 @@ def render_source_selection():
                 raw_text = ""
                 if pdf_docs:
                     raw_text += get_pdf_text(pdf_docs) + "\n\n"
+                    import base64
+                    # Save the first PDF as base64 for previewing
+                    st.session_state.pdf_base64 = base64.b64encode(pdf_docs[0].getvalue()).decode("utf-8")
+                    st.session_state.pdf_name = pdf_docs[0].name
                 if youtube_url:
                     try:
                         raw_text += get_youtube_transcript(youtube_url) + "\n\n"
@@ -495,15 +563,39 @@ def render_source_selection():
 
 
 def render_chat():
-    st.markdown("""
-    <div class="chat-nav">
-        <div class="chat-nav-logo"><div class="chat-nav-logo-icon">🧠</div> Scapia AI</div>
+    # Top Bar (Main Area Header)
+    st.markdown('''
+    <div class="top-bar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Search">
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 16px;">🔔</div>
+            <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #334155;">
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
 
     with st.sidebar:
-        # Custom CSS for sidebar
-        # New Chat & Source Docs Buttons
+        st.markdown('''
+        <div class="logo-area">
+            <div class="logo-icon">S</div>
+            Scapia AI
+        </div>
+        ''', unsafe_allow_html=True)
+        
+        st.markdown('''
+        <a href="#" class="sidebar-menu-item active"><span>📊</span> Dashboard</a>
+        <a href="#" class="sidebar-menu-item"><span>🗂️</span> Projects</a>
+        <a href="#" class="sidebar-menu-item"><span>📄</span> Documents</a>
+        <a href="#" class="sidebar-menu-item"><span>▶️</span> YouTube</a>
+        <a href="#" class="sidebar-menu-item"><span>⏱️</span> History</a>
+        <a href="#" class="sidebar-menu-item" style="margin-top: 100px;"><span>⚙️</span> Settings</a>
+        ''', unsafe_allow_html=True)
+        
+        st.markdown("<hr style='border-color: #1f2937; margin: 20px 16px;'>", unsafe_allow_html=True)
+        
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
             if st.button("＋ New Chat", use_container_width=True):
@@ -516,80 +608,68 @@ def render_chat():
             if st.button("📄 Add Docs", use_container_width=True):
                 st.session_state.view = "source_selection"
                 st.rerun()
+                
+        st.selectbox("Model", ["Llama 3.1 (Flash)", "Llama 3.3 (Thinking)"], key="model_choice")
 
-        st.markdown("<div style='font-size:11px;font-weight:700;color:#64748b;margin:18px 0 8px;letter-spacing:.06em;'>CHATS</div>", unsafe_allow_html=True)
-
-        # Loop through chats (pinned first)
-        chats_items = list(st.session_state.chats.items())
-        pinned = [(k, v) for k, v in chats_items if v.get("pinned", False)]
-        unpinned = [(k, v) for k, v in chats_items if not v.get("pinned", False)]
+    # Main Layout: 2 Columns
+    col1, col2 = st.columns([1.1, 1])
+    
+    with col1:
+        st.markdown('<div class="dashboard-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header"><div>Document Preview</div><span class="icons">...</span></div>', unsafe_allow_html=True)
         
-        for c_id, c_data in pinned + unpinned:
-            icon = "📌 " if c_data.get("pinned") else "💬 "
-            btn_type = "primary" if c_id == st.session_state.current_chat_id else "secondary"
-            
-            c1, c2 = st.columns([5, 1])
-            with c1:
-                if st.button(icon + c_data.get("title", "Chat"), key=f"btn_{c_id}", type=btn_type, use_container_width=True):
-                    st.session_state.current_chat_id = c_id
-                    st.rerun()
-            with c2:
-                with st.popover("⋮"):
-                    new_title = st.text_input("Rename", value=c_data.get("title", "Chat"), key=f"rename_{c_id}")
-                    if new_title != c_data.get("title", "Chat"):
-                        st.session_state.chats[c_id]["title"] = new_title
-                        save_chats(st.session_state.chats)
-                        st.rerun()
-                    
-                    pin_lbl = "Unpin" if c_data.get("pinned") else "Pin"
-                    if st.button(pin_lbl, key=f"pin_{c_id}", use_container_width=True):
-                        st.session_state.chats[c_id]["pinned"] = not c_data.get("pinned", False)
-                        save_chats(st.session_state.chats)
-                        st.rerun()
-                        
-                    if st.button("Delete", key=f"del_{c_id}", use_container_width=True):
-                        if len(st.session_state.chats) > 1:
-                            del st.session_state.chats[c_id]
-                            if st.session_state.current_chat_id == c_id:
-                                st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
-                            save_chats(st.session_state.chats)
-                            st.rerun()
-                        else:
-                            st.error("Cannot delete last chat.")
-
-    # Main Chat Area
-    active_chat = st.session_state.chats.get(st.session_state.current_chat_id)
-    if not active_chat:
-        st.error("Chat not found.")
-        st.stop()
-        
-    messages = active_chat.get("messages", [])
-
-    if not messages:
-        st.markdown("""
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:65vh;text-align:center; transform: translateX(-65px);">
-            <div style="font-size:42px;font-weight:800;color:#f8fafc;letter-spacing:-1px;margin-bottom:12px;">What would you like to know?</div>
-            <div style="font-size:16px;color:#94a3b8;">Upload a document in the sidebar, then ask away.</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown('<div style="max-width: 750px; margin: 0 auto; padding-top: 20px; padding-bottom: 120px; transform: translateX(-65px);">', unsafe_allow_html=True)
-    for message in messages:
-        if message["role"] == "user":
-            st.markdown(f"""
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
-                <div style="background: #312e81; border: 1px solid #3730a3; border-radius: 16px 16px 4px 16px; padding: 12px 18px; max-width: 75%; color: #f8fafc; font-size: 15px; line-height: 1.6; word-wrap: break-word;">
-                    {message["content"]}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        if "pdf_base64" in st.session_state and st.session_state.pdf_base64:
+            pdf_data = st.session_state.pdf_base64
+            st.markdown(f'<iframe src="data:application/pdf;base64,{pdf_data}#toolbar=0&navpanes=0&scrollbar=0" class="pdf-iframe"></iframe>', unsafe_allow_html=True)
         else:
-            with st.chat_message("assistant"):
-                st.markdown(message["content"])
-    st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('<div class="pdf-placeholder">No Document Uploaded</div>', unsafe_allow_html=True)
+            
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Custom Floating CSS for Model Selectbox
-    st.selectbox("", ["Llama 3.1 (Flash)", "Llama 3.3 (Thinking)"], key="model_choice", label_visibility="collapsed")
+    with col2:
+        st.markdown('<div class="dashboard-panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header"><div>Scapia AI Assistant</div><span class="icons">...</span></div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="chat-history">', unsafe_allow_html=True)
+        
+        active_chat = st.session_state.chats.get(st.session_state.current_chat_id)
+        if not active_chat:
+            st.error("Chat not found.")
+            st.stop()
+            
+        messages = active_chat.get("messages", [])
+
+        if not messages:
+            st.markdown('''
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:#64748b;padding-top:40px;">
+                <div>Upload a document, then ask away.</div>
+            </div>
+            ''', unsafe_allow_html=True)
+
+        for message in messages:
+            if message["role"] == "user":
+                st.markdown(f'''
+                <div class="user-msg-container">
+                    <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" class="user-avatar">
+                    <div style="width: 100%;">
+                        <div class="msg-header">User</div>
+                        <div class="msg-content">{message["content"]}</div>
+                    </div>
+                </div>
+                ''', unsafe_allow_html=True)
+            else:
+                st.markdown(f'''
+                <div class="ai-msg-container">
+                    <div class="ai-avatar">S</div>
+                    <div style="width: 100%;">
+                        <div class="msg-header" style="color: #10b981;">Scapia AI</div>
+                        <div class="ai-msg-content">{message["content"]}</div>
+                    </div>
+                </div>
+                ''', unsafe_allow_html=True)
+                
+        st.markdown('</div>', unsafe_allow_html=True) # End chat history
+        st.markdown('</div>', unsafe_allow_html=True) # End dashboard-panel
 
     if prompt := st.chat_input("Message Scapia AI..."):
         messages.append({"role": "user", "content": prompt})
@@ -599,7 +679,6 @@ def render_chat():
     # Handle Assistant Response if last message is from user
     if messages and messages[-1]["role"] == "user":
         
-        # Auto rename if this is the first message and title is "New Chat"
         if len(messages) == 1 and active_chat["title"] == "New Chat":
             first_msg = messages[0]["content"]
             try:
@@ -615,23 +694,21 @@ def render_chat():
             st.session_state.chats = chats_copy
             save_chats(st.session_state.chats)
 
-        with st.chat_message("assistant"):
-            vs = load_vector_store()
-            if not vs:
-                answer = "Please upload and process a document first using the sidebar."
-                st.markdown(answer)
-                messages.append({"role": "assistant", "content": answer})
-                save_chats(st.session_state.chats)
-            else:
-                with st.spinner(""):
-                    run_chain = get_conversational_chain(vs, st.session_state.model_choice, messages)
-                    prompt_text = messages[-1]["content"]
-                    answer, sources = run_chain(prompt_text)
-                
-                st.markdown(answer)
-                messages.append({"role": "assistant", "content": answer})
-                save_chats(st.session_state.chats)
-
+        vs = load_vector_store()
+        if not vs:
+            answer = "Please upload and process a document first using the sidebar."
+            messages.append({"role": "assistant", "content": answer})
+            save_chats(st.session_state.chats)
+            st.rerun()
+        else:
+            with st.spinner("Thinking..."):
+                run_chain = get_conversational_chain(vs, st.session_state.model_choice, messages)
+                prompt_text = messages[-1]["content"]
+                answer, sources = run_chain(prompt_text)
+            
+            messages.append({"role": "assistant", "content": answer})
+            save_chats(st.session_state.chats)
+            st.rerun()
 
 # ── Router ─────────────────────────────────────────────────────
 if st.session_state.view == "landing":
