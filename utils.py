@@ -46,33 +46,47 @@ def extract_video_id(url):
 
 def get_youtube_transcript_ytdlp(url):
     """Fallback method to fetch transcript using yt-dlp."""
-    ydl_opts = {
-        'skip_download': True,
-        'writesubtitles': True,
-        'writeautomaticsub': True,
-        'subtitleslangs': ['en'],
-        'quiet': True,
-        'no_warnings': True
-    }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        subs = info.get('requested_subtitles', {})
-        if subs and 'en' in subs:
-            sub_url = subs['en']['url']
-            response = requests.get(sub_url)
-            response.raise_for_status()
+    browsers = ['chrome', 'safari', 'firefox', 'edge', None]
+    last_error = None
+    
+    for browser in browsers:
+        ydl_opts = {
+            'skip_download': True,
+            'writesubtitles': True,
+            'writeautomaticsub': True,
+            'subtitleslangs': ['en'],
+            'quiet': True,
+            'no_warnings': True
+        }
+        if browser:
+            ydl_opts['cookiesfrombrowser'] = (browser,)
             
-            # Parse VTT
-            vtt = webvtt.read_buffer(io.StringIO(response.text))
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+                subs = info.get('requested_subtitles', {})
+                if subs and 'en' in subs:
+                    sub_url = subs['en']['url']
+                    response = requests.get(sub_url)
+                    response.raise_for_status()
+                    
+                    # Parse VTT
+                    vtt = webvtt.read_buffer(io.StringIO(response.text))
+                    
+                    # Remove duplicates which are common in auto-generated subs
+                    lines = [caption.text.replace("\n", " ").strip() for caption in vtt]
+                    unique_lines = []
+                    for line in lines:
+                        if not unique_lines or line != unique_lines[-1]:
+                            unique_lines.append(line)
+                    return " ".join(unique_lines)
+                else:
+                    last_error = Exception("No English subtitles found via yt-dlp.")
+        except Exception as e:
+            last_error = e
+            continue
             
-            # Remove duplicates which are common in auto-generated subs
-            lines = [caption.text.replace("\n", " ").strip() for caption in vtt]
-            unique_lines = []
-            for line in lines:
-                if not unique_lines or line != unique_lines[-1]:
-                    unique_lines.append(line)
-            return " ".join(unique_lines)
-        raise Exception("No English subtitles found via yt-dlp.")
+    raise Exception(f"Failed to fetch transcript with yt-dlp. Last error: {last_error}")
 
 def get_youtube_transcript(url):
     """Fetch transcript from a YouTube video."""
